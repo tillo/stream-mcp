@@ -23,7 +23,13 @@ RUN echo "cache day: ${CACHEBUST_DAY}" && \
 ARG SUPERGATEWAY_VERSION=latest
 ARG MCP_PACKAGE=@evertrust/stream-mcp
 ARG MCP_VERSION=1.0.1
-RUN npm install -g "supergateway@${SUPERGATEWAY_VERSION}" "${MCP_PACKAGE}@${MCP_VERSION}" && \
+# node:24's bundled npm carries its OWN dependency tree (tar, brace-expansion,
+# ip-address) that drifts onto grype-flagged HIGH/CRITICAL versions. Upgrade npm
+# in-place first so those bundled deps land on patched versions (npm 11.20.0
+# bundles tar@7.5.22, brace-expansion@5.0.9, ip-address@10.5.0).
+ARG NPM_VERSION=11.20.0
+RUN npm install -g "npm@${NPM_VERSION}" && \
+    npm install -g "supergateway@${SUPERGATEWAY_VERSION}" "${MCP_PACKAGE}@${MCP_VERSION}" && \
     npm cache clean --force
 
 # Declare the meaningful version (consumed by the optional CI version-tag job).
