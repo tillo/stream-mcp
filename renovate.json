@@ -21,7 +21,10 @@
         "patch"
       ],
       "matchPackageNames": [
-        "__none__"
+        "__none__",
+        "@evertrust/stream-mcp",
+        "node",
+        "npm"
       ],
       "automerge": true,
       "labels": [
@@ -36,7 +39,10 @@
         "digest"
       ],
       "matchPackageNames": [
-        "__none__"
+        "__none__",
+        "@evertrust/stream-mcp",
+        "node",
+        "npm"
       ],
       "automerge": true,
       "labels": [
