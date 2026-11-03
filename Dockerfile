@@ -20,13 +20,18 @@ RUN echo "cache day: ${CACHEBUST_DAY}" && \
 
 # Bake supergateway + the MCP package so there is NO runtime `npm install` (the live
 # deployment used to install on every pod start — ~38s plus node-engine warnings).
-ARG SUPERGATEWAY_VERSION=latest
+# Both are pinned with a `# renovate:` line (renovate.json, infra-ik4p.1): supergateway
+# used to be `latest`, which every daily CACHEBUST rebuild moved without an MR.
+# renovate: datasource=npm depName=supergateway
+ARG SUPERGATEWAY_VERSION=4.2.1
 ARG MCP_PACKAGE=@evertrust/stream-mcp
+# renovate: datasource=npm depName=@evertrust/stream-mcp
 ARG MCP_VERSION=1.0.1
 # node:24's bundled npm carries its OWN dependency tree (tar, brace-expansion,
 # ip-address) that drifts onto grype-flagged HIGH/CRITICAL versions. Upgrade npm
 # in-place first so those bundled deps land on patched versions (npm 11.20.0
 # bundles tar@7.5.22, brace-expansion@5.0.9, ip-address@10.5.0).
+# renovate: datasource=npm depName=npm
 ARG NPM_VERSION=11.20.0
 RUN npm install -g "npm@${NPM_VERSION}" && \
     npm install -g "supergateway@${SUPERGATEWAY_VERSION}" "${MCP_PACKAGE}@${MCP_VERSION}" && \
