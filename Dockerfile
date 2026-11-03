@@ -62,5 +62,18 @@ ENV MCP_BIN=stream-mcp \
     HOME=/tmp \
     npm_config_cache=/tmp/.npm
 
+# Smoke test (fails the build): bridge the MCP exactly as start.sh does and speak to
+# it as a 2025-11-25 client — initialize, then tools/list must return tools. An MCP
+# release that refuses supergateway's initialize handshake (@evertrust/horizon-mcp
+# 3.x did: 2026-07-28-only) builds and starts fine yet serves nothing. The STREAM_*
+# values are dummies: stream-mcp authenticates on the first tool call, not at start.
+COPY smoke.mjs /app/smoke.mjs
+RUN STREAM_URL=https://127.0.0.1:9 STREAM_API_ID=smoke STREAM_API_IDPROV=smoke STREAM_API_KEY=smoke; \
+    export STREAM_URL STREAM_API_ID STREAM_API_IDPROV STREAM_API_KEY; \
+    supergateway --stdio "${MCP_BIN}" --outputTransport streamableHttp --port 9099 \
+      ${SUPERGATEWAY_FLAGS} >/tmp/smoke-gateway.log 2>&1 & gw=$!; \
+    node /app/smoke.mjs 9099; rc=$?; kill "$gw"; \
+    [ "$rc" = 0 ] || tail -20 /tmp/smoke-gateway.log; rm -f /tmp/smoke-gateway.log; exit "$rc"
+
 EXPOSE 8080
 ENTRYPOINT ["/usr/bin/tini", "--", "/app/start.sh"]
