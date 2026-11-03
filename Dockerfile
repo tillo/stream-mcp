@@ -32,7 +32,7 @@ ARG MCP_VERSION=1.0.2
 # in-place first so those bundled deps land on patched versions (npm 11.20.0
 # bundles tar@7.5.22, brace-expansion@5.0.9, ip-address@10.5.0).
 # renovate: datasource=npm depName=npm
-ARG NPM_VERSION=11.21.1
+ARG NPM_VERSION=12.2.1
 RUN npm install -g "npm@${NPM_VERSION}" && \
     npm install -g "supergateway@${SUPERGATEWAY_VERSION}" "${MCP_PACKAGE}@${MCP_VERSION}" && \
     npm cache clean --force
