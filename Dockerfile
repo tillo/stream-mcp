@@ -26,7 +26,7 @@ RUN echo "cache day: ${CACHEBUST_DAY}" && \
 ARG SUPERGATEWAY_VERSION=4.2.1
 ARG MCP_PACKAGE=@evertrust/stream-mcp
 # renovate: datasource=npm depName=@evertrust/stream-mcp
-ARG MCP_VERSION=1.0.1
+ARG MCP_VERSION=1.0.2
 # node:24's bundled npm carries its OWN dependency tree (tar, brace-expansion,
 # ip-address) that drifts onto grype-flagged HIGH/CRITICAL versions. Upgrade npm
 # in-place first so those bundled deps land on patched versions (npm 11.20.0
