@@ -27,15 +27,25 @@ ARG SUPERGATEWAY_VERSION=4.2.1
 ARG MCP_PACKAGE=@evertrust/stream-mcp
 # renovate: datasource=npm depName=@evertrust/stream-mcp
 ARG MCP_VERSION=1.0.2
-# node:24's bundled npm carries its OWN dependency tree (tar, brace-expansion,
-# ip-address) that drifts onto grype-flagged HIGH/CRITICAL versions. Upgrade npm
-# in-place first so those bundled deps land on patched versions (npm 11.20.0
-# bundles tar@7.5.22, brace-expansion@5.0.9, ip-address@10.5.0).
-# renovate: datasource=npm depName=npm
-ARG NPM_VERSION=12.2.1
-RUN npm install -g "npm@${NPM_VERSION}" && \
-    npm install -g "supergateway@${SUPERGATEWAY_VERSION}" "${MCP_PACKAGE}@${MCP_VERSION}" && \
-    npm cache clean --force
+# Installed as a local project, not `npm install -g`: supergateway pins some of its
+# own dependencies exactly (MCP SDK/client/server), so a fix inside the same major
+# never arrived, and npm applies `overrides` only to a project. float-pins.js turns
+# each exact pin into a scoped `^x.y.z` override and the second install takes the
+# newest fix; the daily CACHEBUST above re-runs it. npm itself is removed afterwards
+# (it used to be upgraded in place to dodge its bundled tar/brace-expansion/undici
+# CVEs): nothing runs it at runtime, so its bundled tree is pure attack surface.
+COPY float-pins.js /tmp/float-pins.js
+WORKDIR /opt/mcp
+RUN printf '{"private":true,"dependencies":{"supergateway":"%s","%s":"%s"}}\n' \
+      "${SUPERGATEWAY_VERSION}" "${MCP_PACKAGE}" "${MCP_VERSION}" > package.json && \
+    npm install --omit=dev --ignore-scripts --no-audit --no-fund && \
+    node /tmp/float-pins.js . && rm -rf node_modules package-lock.json && \
+    npm install --omit=dev --ignore-scripts --no-audit --no-fund && \
+    npm ls --all --omit=dev >/dev/null && \
+    npm cache clean --force && \
+    rm -rf /tmp/float-pins.js /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
+      /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack /tmp/.npm /root/.npm
+ENV PATH=/opt/mcp/node_modules/.bin:${PATH}
 
 # Declare the meaningful version (consumed by the optional CI version-tag job).
 RUN echo "${MCP_VERSION}" > /etc/image-version
@@ -59,8 +69,7 @@ ENV MCP_BIN=stream-mcp \
     SUPERGATEWAY_FLAGS="" \
     LISTEN_PORT=8080 \
     INTERNAL_PORT=9090 \
-    HOME=/tmp \
-    npm_config_cache=/tmp/.npm
+    HOME=/tmp
 
 # Smoke test (fails the build): bridge the MCP exactly as start.sh does and speak to
 # it as a 2025-11-25 client — initialize, then tools/list must return tools. An MCP
