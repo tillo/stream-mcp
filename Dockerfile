@@ -34,7 +34,7 @@ ARG MCP_VERSION=1.0.2
 # newest fix; the daily CACHEBUST above re-runs it. npm itself is removed afterwards
 # (it used to be upgraded in place to dodge its bundled tar/brace-expansion/undici
 # CVEs): nothing runs it at runtime, so its bundled tree is pure attack surface.
-COPY float-pins.js /tmp/float-pins.js
+COPY float-pins.js lift.json /tmp/
 WORKDIR /opt/mcp
 RUN printf '{"private":true,"dependencies":{"supergateway":"%s","%s":"%s"}}\n' \
       "${SUPERGATEWAY_VERSION}" "${MCP_PACKAGE}" "${MCP_VERSION}" > package.json && \
@@ -43,7 +43,7 @@ RUN printf '{"private":true,"dependencies":{"supergateway":"%s","%s":"%s"}}\n' \
     npm install --omit=dev --ignore-scripts --no-audit --no-fund && \
     npm ls --all --omit=dev >/dev/null && \
     npm cache clean --force && \
-    rm -rf /tmp/float-pins.js /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
+    rm -rf /tmp/float-pins.js /tmp/lift.json /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
       /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack /tmp/.npm /root/.npm
 ENV PATH=/opt/mcp/node_modules/.bin:${PATH}
 
