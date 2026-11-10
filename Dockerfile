@@ -23,7 +23,7 @@ RUN echo "cache day: ${CACHEBUST_DAY}" && \
 # Both are pinned with a `# renovate:` line (renovate.json, infra-ik4p.1): supergateway
 # used to be `latest`, which every daily CACHEBUST rebuild moved without an MR.
 # renovate: datasource=npm depName=supergateway
-ARG SUPERGATEWAY_VERSION=4.2.1
+ARG SUPERGATEWAY_VERSION=4.2.2
 ARG MCP_PACKAGE=@evertrust/stream-mcp
 # renovate: datasource=npm depName=@evertrust/stream-mcp
 ARG MCP_VERSION=1.0.2
