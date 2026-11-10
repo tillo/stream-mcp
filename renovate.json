@@ -23,7 +23,8 @@
       "matchPackageNames": [
         "__none__",
         "@evertrust/stream-mcp",
-        "node"
+        "node",
+        "supergateway"
       ],
       "automerge": true,
       "labels": [
@@ -40,7 +41,8 @@
       "matchPackageNames": [
         "__none__",
         "@evertrust/stream-mcp",
-        "node"
+        "node",
+        "supergateway"
       ],
       "automerge": true,
       "labels": [
