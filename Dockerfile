@@ -26,7 +26,7 @@ RUN echo "cache day: ${CACHEBUST_DAY}" && \
 ARG SUPERGATEWAY_VERSION=4.2.2
 ARG MCP_PACKAGE=@evertrust/stream-mcp
 # renovate: datasource=npm depName=@evertrust/stream-mcp
-ARG MCP_VERSION=1.0.2
+ARG MCP_VERSION=1.1.0
 # Installed as a local project, not `npm install -g`: supergateway pins some of its
 # own dependencies exactly (MCP SDK/client/server), so a fix inside the same major
 # never arrived, and npm applies `overrides` only to a project. float-pins.js turns
